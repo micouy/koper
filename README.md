@@ -20,30 +20,32 @@ The code and the app state are persisted even if you close the tab.
 
 ## Using shared state
 
-In `koper`, you have two types of state: local state and shared state.
+In `koper`, you have two types of synced state: shared state and player state.
 
-Local state is regular JavaScript variables that exist only on your device. Other users cannot see changes to local state.
-
-```javascript
-let score = 0;  // Local - only your device sees this
-```
-
-Shared state is stored in the Y.js document and synced between both devices. When you change shared state, the other person sees the change immediately.
-
-To use shared state, access the Y.js document via `p5.ydoc`:
+Shared state is for data that is not specific to any player. All players read and write the same shared values.
 
 ```javascript
-// Get the shared state map
-const state = p5.ydoc.getMap('state');
-
-// Read shared state
-let score = state.get('score') || 0;
-
-// Update shared state (synced to other device)
-state.set('score', score + 1);
+// Shared state - everyone sees and can modify this
+state.set('gameStarted', true);
+state.set('totalCount', 10);
 ```
 
-When you use shared state, both devices run the same logic and stay in sync. If you use local state, each device has its own copy.
+Player state is specific to each peer. Each player has their own state that only they can write to, but everyone can read all players' states.
+
+```javascript
+// Get this player's state - only you can write here
+const player = state.getPlayer();
+player.set('score', 5);
+
+// Get all players' states - read-only
+const allPlayers = state.getPlayers();
+```
+
+Local state is not synced and exists only on your device.
+
+```javascript
+let temp = 0;  // Local - only your device sees this
+```
 
 ## Troubleshooting
 
