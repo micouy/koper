@@ -4,9 +4,9 @@ import { $peer } from "../stores/peer";
 import {
   $turnConfig,
   setTurnConfig,
-  isTurnConfigComplete,
 } from "../stores/turn";
 import { peerManager } from "../lib/peerjs-peer-manager";
+import githubIcon from "../assets/github-mark-white.svg";
 
 export function Navbar() {
   const peer = useStore($peer);
@@ -47,74 +47,92 @@ export function Navbar() {
     setPeerIdInput("");
   };
 
-  const canUseTurn = isTurnConfigComplete(turn);
-
-  const shortPeerId = peer.peerId ? peer.peerId.slice(0, 8) : "--------";
+  const peerIdDisplay = peer.peerId || "--------";
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-2 flex-wrap border-b border-border p-2">
+    <div className="flex flex-col overflow-visible">
+      <div className="flex items-center gap-2 flex-wrap border-b border-border px-4 py-2">
+        <div className="flex items-center gap-3">
+          <span className="whitespace-nowrap">
+            <span className="font-bold text-text-muted">koper</span>
+            <span className="font-bold text-text-muted">.</span>
+            <a
+              href="https://powierz.art"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold hover:underline transition-colors"
+            >
+              powierz.art
+            </a>
+          </span>
+          <a
+            href="https://github.com/micouy/koper"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity"
+            aria-label="GitHub repository"
+          >
+            <img src={githubIcon} alt="GitHub" width="20" height="20" />
+          </a>
+          <span className="text-sm text-text-muted">collaborative code playground</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={copyCode}
+            disabled={!peer.peerId}
+            title={
+              copied
+                ? "Copied!"
+                : peer.peerId
+                ? "Click to copy peer ID"
+                : "Connecting..."
+            }
+            className={`font-semibold px-3 py-1 transition-colors border w-[100px] overflow-hidden text-ellipsis whitespace-nowrap ${
+              copied
+                ? "bg-bg-active border-border-strong"
+                : "bg-bg-active border-border hover:border-border-strong"
+            } ${!peer.peerId ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            {copied ? "Copied" : peerIdDisplay}
+          </button>
+          {peer.connectionStatus === "disconnected" && peer.peerId && (
+            <>
+              <input
+                placeholder="Peer's ID"
+                value={peerIdInput}
+                onChange={(e) =>
+                  setPeerIdInput((e.target as HTMLInputElement).value)
+                }
+                className="w-[180px] text-center font-mono bg-bg-active border border-border px-2 py-1"
+              />
+              <button
+                onClick={connect}
+                disabled={!peerIdInput}
+                className="px-3 py-1 bg-bg-active border border-border hover:border-border-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title={
+                  peerIdInput
+                    ? "Connect to peer"
+                    : "Connect (will check clipboard)"
+                }
+              >
+                Connect
+              </button>
+            </>
+          )}
+          <span>{peer.connectionStatus}</span>
+        </div>
+        <div className="flex-1"></div>
         <button
           onClick={() => setExpandedTurn((v) => !v)}
-          aria-label="Toggle settings"
-          className="min-w-[24px] hover:text-text transition-colors"
+          className="text-sm text-text-muted cursor-pointer"
         >
-          {expandedTurn ? "▾" : "▸"}
+          TURN settings
         </button>
-        <button
-          onClick={copyCode}
-          disabled={!peer.peerId}
-          title={
-            copied
-              ? "Copied!"
-              : peer.peerId
-              ? "Click to copy peer ID"
-              : "Connecting..."
-          }
-          className={`font-semibold px-3 py-1 transition-colors border w-[100px] ${
-            copied
-              ? "bg-bg-active border-border-strong"
-              : "bg-bg-active border-border hover:border-border-strong"
-          } ${!peer.peerId ? "opacity-50 cursor-not-allowed" : ""}`}
-        >
-          {copied ? "Copied" : shortPeerId}
-        </button>
-        {peer.connectionStatus === "disconnected" && peer.peerId && (
-          <>
-            <input
-              placeholder="Peer's ID"
-              value={peerIdInput}
-              onChange={(e) =>
-                setPeerIdInput((e.target as HTMLInputElement).value)
-              }
-              className="w-[180px] text-center font-mono bg-bg-active border border-border px-2 py-1"
-            />
-            <button
-              onClick={connect}
-              disabled={!peerIdInput}
-              className="px-3 py-1 bg-bg-active border border-border hover:border-border-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title={
-                peerIdInput
-                  ? "Connect to peer"
-                  : "Connect (will check clipboard)"
-              }
-            >
-              Connect
-            </button>
-          </>
-        )}
-        <span>{peer.connectionStatus}</span>
-        {!expandedTurn && canUseTurn && (
-          <span className="text-xs text-text-muted">TURN</span>
-        )}
       </div>
 
       {expandedTurn && (
         <div className="border-b border-border p-2">
-          <div className="text-sm text-text-muted mb-2">
-            TURN Server {canUseTurn ? "(configured)" : "(using STUN only)"}
-          </div>
-          <div className="flex gap-2 items-center flex-wrap">
+          <div className="flex gap-2 items-center flex-wrap justify-end">
             <input
               placeholder="TURN url (turn:host:port)"
               value={turn.url}

@@ -6,7 +6,9 @@ https://github.com/user-attachments/assets/50f77fea-29d1-4465-b1a7-75839a035baa
 
 ## Getting started
 
-Download `index.html` from the [release](https://github.com/micouy/koper/releases) on your device. The person you want to collaborate with needs to download the same file on their device. Then both of you need to open the file.
+Easiest way: open https://koper.powierz.art on both devices and connect.
+
+Or download `index.html` from the [release](https://github.com/micouy/koper/releases) on your device. The person you want to collaborate with needs to download the same file on their device. Then both of you need to open the file.
 
 One of you needs to copy your ID (just click on it) and give it to the other person, who needs to paste it into their app and click Connect. When you see 'connected', you're good to go.
 

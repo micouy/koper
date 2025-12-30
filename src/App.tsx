@@ -58,11 +58,13 @@ export function App() {
   return (
     <div className="flex flex-col h-full w-full">
       <Navbar />
-      <EditorSection
-        ydoc={ydoc}
-        indexeddbProvider={indexeddbProvider}
-        clearAllState={clearAllState}
-      />
+      <div className="flex-1">
+        <EditorSection
+          ydoc={ydoc}
+          indexeddbProvider={indexeddbProvider}
+          clearAllState={clearAllState}
+        />
+      </div>
     </div>
   );
 }
@@ -215,64 +217,64 @@ function EditorWithRunner({
   return (
     <div className="flex w-full h-full">
       <div className="flex flex-col flex-1 min-w-0 border-r border-border">
-        <div className="flex items-center">
-          <button
-            onClick={() => setActiveTab("code")}
-            className={cn(
-              "w-20 p-2 border-b border-border cursor-pointer text-text",
-              activeTab === "code"
-                ? "border-0 bg-bg-active font-semibold"
-                : "border border-border bg-transparent font-normal"
-            )}
-          >
-            Code
-          </button>
-          <button
-            onClick={() => setActiveTab("state")}
-            className={cn(
-              "w-20 p-2 border-b border-border border-l cursor-pointer text-text",
-              activeTab === "state"
-                ? "border-l border-b bg-bg-active font-semibold"
-                : "border bg-transparent font-normal"
-            )}
-          >
-            State
-          </button>
-          <button
-            onClick={() => setActiveTab("logs")}
-            className={cn(
-              "w-20 p-2 border-b border-border border-l cursor-pointer text-text",
-              activeTab === "logs"
-                ? "border-l border-b bg-bg-active font-semibold"
-                : "border bg-transparent font-normal"
-            )}
-          >
-            Logs
-          </button>
-          <button
-            onClick={handleRun}
-            className="px-4 py-2 mr-2 bg-green-600 border border-green-700 cursor-pointer text-white font-semibold"
-          >
-            Run
-          </button>
+        <div className="flex items-center justify-between">
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab("code")}
+              className={cn(
+                "w-20 p-2 border-b border-border cursor-pointer text-text",
+                activeTab === "code"
+                  ? "border-0 bg-bg-active font-semibold"
+                  : "border border-border bg-transparent font-normal"
+              )}
+            >
+              Code
+            </button>
+            <button
+              onClick={() => setActiveTab("state")}
+              className={cn(
+                "w-20 p-2 border-b border-border border-l cursor-pointer text-text",
+                activeTab === "state"
+                  ? "border-l border-b bg-bg-active font-semibold"
+                  : "border bg-transparent font-normal"
+              )}
+            >
+              State
+            </button>
+            <button
+              onClick={() => setActiveTab("logs")}
+              className={cn(
+                "w-20 p-2 border-b border-border border-l cursor-pointer text-text",
+                activeTab === "logs"
+                  ? "border-l border-b bg-bg-active font-semibold"
+                  : "border bg-transparent font-normal"
+              )}
+            >
+              Logs
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                codeManager.setCode(COUNTER_BUTTON_EXAMPLE);
+              }}
+              className="px-2 py-1 text-sm underline cursor-pointer text-text bg-transparent hover:text-text-strong"
+            >
+              Load Example
+            </button>
+            <button
+              onClick={handleRun}
+              className="px-4 py-2 bg-green-600 border border-green-700 cursor-pointer text-white font-semibold"
+            >
+              Run
+            </button>
+          </div>
         </div>
         <div className="flex flex-col flex-1">
           {activeTab === "code" && (
-            <>
-              <div className="flex gap-2 p-2 border-b border-border">
-                <button
-                  onClick={() => {
-                    codeManager.setCode(COUNTER_BUTTON_EXAMPLE);
-                  }}
-                  className="px-1 py-0 text-sm underline cursor-pointer text-text bg-transparent hover:text-text-strong"
-                >
-                  Load Example
-                </button>
-              </div>
-              <div className="w-full flex-1">
-                <CodeEditor codeManager={codeManager} />
-              </div>
-            </>
+            <div className="w-full flex-1">
+              <CodeEditor codeManager={codeManager} />
+            </div>
           )}
           {activeTab === "state" && (
             <div className="flex-1 p-2 flex flex-col min-h-0">
