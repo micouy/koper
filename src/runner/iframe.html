@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #303030;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.min.js"></script>
+    <script>
+      (async function () {
+        const Y = await import("https://esm.sh/yjs");
+        window.Y = Y;
+
+        // Intercept console methods to send logs to parent
+        const originalConsole = {
+          log: console.log,
+          warn: console.warn,
+          error: console.error,
+        };
+
+        const sendLog = (args) => {
+          parent.postMessage(
+            {
+              __p5Bridge: true,
+              action: "console-log",
+              args: Array.from(args),
+            },
+            "*"
+          );
+        };
+
+        console.log = function (...args) {
+          sendLog(args);
+          originalConsole.log.apply(console, args);
+        };
+        console.warn = function (...args) {
+          sendLog(args);
+          originalConsole.warn.apply(console, args);
+        };
+        console.error = function (...args) {
+          sendLog(args);
+          originalConsole.error.apply(console, args);
+        };
+
+        const doc = new Y.Doc();
+        const stateMap = doc.getMap("state");
+
+        doc.on("update", (update) => {
+          parent.postMessage(
+            {
+              __p5Bridge: true,
+              action: "y-update",
+              update: Array.from(update),
+            },
+            "*"
+          );
+        });
+
+        let playerId = null;
+
+        function handleMessage(event) {
+          const data = event && event.data;
+          if (!data || data.__p5Bridge !== true) return;
+
+          if (data.action === "y-update" && data.update) {
+            const u8 = new Uint8Array(data.update);
+            Y.applyUpdate(doc, u8, "parent");
+          } else if (data.action === "init" && data.code && data.playerId) {
+            playerId = data.playerId;
+            initializeSketch(data.code);
+          }
+        }
+
+        window.addEventListener("message", handleMessage);
+
+        function initializeSketch(code) {
+          window.state = {
+            get(key) {
+              try {
+                return stateMap.get(String(key));
+              } catch (error) {
+                console.error("Error getting state key:", key, error);
+                throw error;
+              }
+            },
+            set(key, value) {
+              try {
+                stateMap.set(String(key), value);
+              } catch (error) {
+                console.error(
+                  "Error setting state key:",
+                  key,
+                  "value:",
+                  value,
+                  "error:",
+                  error
+                );
+                throw error;
+              }
+            },
+
+            getPlayer() {
+              try {
+                // Helper to get the current player map (re-fetch each time to avoid stale references)
+                const getPlayerMap = () => {
+                  let playersMap = stateMap.get("players");
+                  if (!playersMap) {
+                    playersMap = new Y.Map();
+                    stateMap.set("players", playersMap);
+                  }
+
+                  let playerMap = playersMap.get(playerId);
+                  if (!playerMap) {
+                    playerMap = new Y.Map();
+                    playersMap.set(playerId, playerMap);
+                  }
+
+                  return playerMap;
+                };
+
+                // Return wrapper that re-fetches playerMap on each call
+                return {
+                  get(key) {
+                    try {
+                      const playerMap = getPlayerMap();
+                      return playerMap.get(String(key));
+                    } catch (error) {
+                      console.error("Error getting player key:", key, error);
+                      throw error;
+                    }
+                  },
+                  set(key, value) {
+                    try {
+                      const playerMap = getPlayerMap();
+                      playerMap.set(String(key), value);
+                    } catch (error) {
+                      console.error(
+                        "Error setting player key:",
+                        key,
+                        "value:",
+                        value,
+                        "error:",
+                        error
+                      );
+                      throw error;
+                    }
+                  },
+                };
+              } catch (error) {
+                console.error("Error in getPlayer():", error);
+                throw error;
+              }
+            },
+
+            getPlayers() {
+              try {
+                const playersMap = stateMap.get("players");
+                if (!playersMap) return {};
+
+                const result = {};
+                playersMap.forEach((playerMap, id) => {
+                  const playerData = {};
+                  playerMap.forEach((value, key) => {
+                    playerData[key] = value;
+                  });
+                  result[id] = playerData;
+                });
+                return result;
+              } catch (error) {
+                console.error("Error in getPlayers():", error);
+                throw error;
+              }
+            },
+          };
+
+          // Use p5 instance mode, binding to global setup/draw
+          new p5((p) => {
+            eval(code);
+          });
+        }
+
+        parent.postMessage({ __p5Bridge: true, action: "ready" }, "*");
+      })();
+    </script>
+  </body>
+</html>
