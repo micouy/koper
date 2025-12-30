@@ -1,6 +1,4 @@
-# `koper` - collaboratively edit and run code
-
-`koper` is a collaborative code editor in a single HTML file.
+# `koper` - collaborative code playground
 
 https://github.com/user-attachments/assets/50f77fea-29d1-4465-b1a7-75839a035baa
 
