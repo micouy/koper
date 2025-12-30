@@ -2,7 +2,7 @@
 
 `koper` is a collaborative code editor in a single HTML file.
 
-https://github.com/user-attachments/assets/374b662a-12d8-46b7-a8a5-49b8833d3097
+https://github.com/user-attachments/assets/50f77fea-29d1-4465-b1a7-75839a035baa
 
 ## Getting started
 
