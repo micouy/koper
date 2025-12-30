@@ -2,6 +2,8 @@
 
 `koper` is a collaborative code editor in a single HTML file.
 
+https://github.com/user-attachments/assets/374b662a-12d8-46b7-a8a5-49b8833d3097
+
 ## Getting started
 
 Download `index.html` from the [release](https://github.com/micouy/koper/releases) on your device. The person you want to collaborate with needs to download the same file on their device. Then both of you need to open the file.
