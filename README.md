@@ -1,4 +1,6 @@
-# `koper` - collaborative code playground
+# `koper`
+
+Peer-to-peer collaborative code playground in a single <1MB HTML file
 
 https://github.com/user-attachments/assets/50f77fea-29d1-4465-b1a7-75839a035baa
 
